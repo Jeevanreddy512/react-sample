@@ -1,35 +1,37 @@
-name: automate-react-s3
+name: CI/CD
 
 on:
- push:
-   branches:
-     - main
-     - Dev
-   # Added comments
-   # Comment2
- pull_request:
-    branches:
-     - main
+  push:
+    branches: [ Devops ]
+  pull_request:
+    branches: [ Devops ]
+
 jobs:
-  deploy:
+  build:
+
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [17.x]
+
     steps:
-      - name: checkout
-        uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      - name: setupnode
-        uses: actions/setup-node@v2
+    - name: Set up Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
 
+    - name: Install dependencies
+      run: npm install
 
-      - run: yarn install
-      - run: yarn build
+    - name: Run the tests and generate coverage report
+      run: npm test -- --coverage
 
-      - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v2
 
-      - name: deploy static site to s3 bucket
-        run: aws s3 sync build/ s3://react-appp101
+    - name: Build
+      run: npm run build
