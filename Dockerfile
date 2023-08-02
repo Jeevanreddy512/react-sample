@@ -6,11 +6,11 @@ WORKDIR /app
 
 # Install App Dependencies
 COPY ["package.json", "yarn.lock", "/app/"]
-RUN yarn
+RUN npm install
 
 # Add App
 COPY [".", "/app"]
 
 # Start App
 EXPOSE 3000
-CMD ["npm", "build"]
+CMD ["npm", "start"]
