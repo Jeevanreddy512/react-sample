@@ -12,4 +12,5 @@ RUN yarn
 COPY [".", "/app"]
 
 # Start App
+EXPOSE 3000
 CMD ["npm", "build"]
